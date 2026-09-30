@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: attendance-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: attendance
+      POSTGRES_USER: attendance_user
+      POSTGRES_PASSWORD: attendance_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - attendance_db:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U attendance_user -d attendance"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  attendance_db:
